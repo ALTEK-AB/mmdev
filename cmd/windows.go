@@ -1,11 +1,11 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+//go:build windows
 
-*/
 package cmd
 
 import (
 	"fmt"
+	"log"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 )
@@ -16,7 +16,15 @@ var windowsCmd = &cobra.Command{
 	Short: "This set up the development environment on the Windows Operating System.",
 	Long:  `The windows command will setup the tools necessary to react-native development on the Windows OS.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("windows called")
+		fmt.Println("Hello Avinash - I'm inside the windows function")
+
+		out, err := exec.Command("Set-ExecutionPolicy Unrestricted -Scope Process -Force;iex (New-Object System.Net.WebClient).DownloadString('https://aka.ms/rnw-deps.ps1')").Output()
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(string(out))
 	},
 }
 
