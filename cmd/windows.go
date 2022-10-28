@@ -4,10 +4,9 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"os/exec"
-
+	"github.com/abdfnx/gosh"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 // windowsCmd represents the windows command
@@ -16,18 +15,18 @@ var windowsCmd = &cobra.Command{
 	Short: "This set up the development environment on the Windows Operating System.",
 	Long:  `The windows command will setup the tools necessary to react-native development on the Windows OS.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello Avinash - I'm inside the windows function")
+		// run a command
+		fmt.Println(">>>> Updating ExecutionPolicy this Process scope ...")
+		gosh.PowershellCommand(`Set-ExecutionPolicy Unrestricted -Scope Process -Force`)
 
-		out, err := exec.Command("Set-ExecutionPolicy Unrestricted -Scope Process -Force;iex (New-Object System.Net.WebClient).DownloadString('https://aka.ms/rnw-deps.ps1')").Output()
-
-		if err != nil {
-			log.Fatal(err)
+		pErr, pOut, _ := gosh.PowershellOutput(`Get-ExecutionPolicy -Scope Process`)
+		if pErr == nil && strings.Contains(pOut, "Unrestricted") {
+			fmt.Println(">>>> ExecutionPolicy has been updated to Unrestricted for this Process scope")
 		}
-
-		fmt.Println(string(out))
 	},
 }
 
+// Use the -Command parameter to specify the command to execute as a String: powershell -Command "Start-Process powershell -verb RunAs"
 func init() {
 	rootCmd.AddCommand(windowsCmd)
 
