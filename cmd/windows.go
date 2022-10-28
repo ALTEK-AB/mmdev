@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"github.com/abdfnx/gosh"
 	"github.com/spf13/cobra"
+	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -15,14 +17,30 @@ var windowsCmd = &cobra.Command{
 	Short: "This set up the development environment on the Windows Operating System.",
 	Long:  `The windows command will setup the tools necessary to react-native development on the Windows OS.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// run a command
-		fmt.Println(">>>> Updating ExecutionPolicy this Process scope ...")
+		// update Execution Policy
+		fmt.Println("## Updating ExecutionPolicy this Process scope ...")
 		gosh.PowershellCommand(`Set-ExecutionPolicy Unrestricted -Scope Process -Force`)
 
+		// verifies if the right policy is in place
 		pErr, pOut, _ := gosh.PowershellOutput(`Get-ExecutionPolicy -Scope Process`)
 		if pErr == nil && strings.Contains(pOut, "Unrestricted") {
-			fmt.Println(">>>> ExecutionPolicy has been updated to Unrestricted for this Process scope")
+			fmt.Println("## ExecutionPolicy has been updated to Unrestricted for this Process scope")
+		} else {
+			// stops execution
+			//panic()
 		}
+
+		// going to run Windows doctor script
+		drCommand := "iex (New-Object System.Net.WebClient).DownloadString('https://aka.ms/rnw-deps.ps1')"
+		drExec := exec.Command("powershell.exe", drCommand)
+		drExec.Stdout = os.Stdout
+		drExec.Stdin = os.Stdin
+		drErr := drExec.Start()
+		if drErr != nil {
+			fmt.Println("errr errr ")
+		}
+		drErr = drExec.Wait()
+		fmt.Println(drErr)
 	},
 }
 
